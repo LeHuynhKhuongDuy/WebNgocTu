@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Firefighter Supervision</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js"></script>
+    <!-- <script src="https://nguyentienthu.net/wp-content/litespeed/localres/aHR0cHM6Ly9tYXBzLmdvb2dsZWFwaXMuY29tL21hcHMvYXBpL2pz?key=YOUR_API_KEY&callback=initMap"
+    async defer></script> -->
+    <style>
+      #map {
+        height: 100%;
+      }
+
+      html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Montserrat';
+        display: inline-block;
+        text-align: center;
+      }
+
+      p {
+        font-size: 1.2rem;
+      }
+
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .topnav {
+        background-color: #049faa;
+        color: white;
+        font-size: 1rem;
+        padding: 5px;
+      }
+
+      button {
+        background-color: #049faa;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      button:hover {
+        opacity: 0.8;
+      }
+
+      .chart-container-row {
+        display: flex;
+        justify-content: center;
+      }
+
+      .chart-container-row-item {
+        width: 1500px;
+        display: block;
+      }
+
+      .belowTopnav{
+        display: flex;
+        background-color: #99dee4;
+      }
+
+      .navbar-brand{
+        float: left;
+        width: 15%;
+      }
+
+      .img-fluid{
+        margin-block-start: 0.5em;
+        margin-block-end: 0.5em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        max-width: 100px;
+        max-height: 100px;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 100%;
+        font-size: 0.9rem;
+        padding: 0.675em 1em 0.675em 1em;
+        background-color: #fff;
+        border: 1px solid #caced1;
+        border-radius: 0.25rem;
+        color: #000;
+        cursor: pointer;
+      }
+
+      .selectUser {
+        float: left;
+        width: 15%;
+        margin-block-start: 1.5em;
+        margin-block-end: 1.5em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+      }
+
+      .userInfo {
+        float: left;
+        width: 20%;
+        margin-block-start: 2em;
+        margin-block-end: 1.5em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+      }
+
+      #statusButton{
+        width: 10%;
+        margin: 15px 10px;
+        padding: 10px;
+        background-color: rgb(12, 12, 153);
+        color: #000;
+        pointer-events: none;
+      }
+
+      .warningGroup{
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .warningSensor{
+        display: block;
+        margin: 10px;
+        border-style: groove;
+      }
+
+      .sensorNote {
+        background-color: #fff;
+        color: black;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+      }
+
+      .sensorNoteContent {
+        padding: 0 18px;
+        display: none;
+        overflow: hidden;
+        background-color: #fff;
+      }
+
+      .childNoteContent {
+        text-align: left;
+      }
+
+      red-marked {
+        background-color: red;
+        font-weight: normal;
+      }
+
+      green-marked {
+        background-color: green;
+        font-weight: normal;
+      }
+
+      @media only screen and (max-width: 550px) {
+        .topnav {
+          font-size: 0.8rem;
+        }
+
+        .img-fluid{
+          margin-block-start: 0.5em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 2px;
+          margin-inline-end: 2px;
+          max-width: 40px;
+          max-height: 40px;
+        }
+
+        select {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 100%;
+          font-size: 0.5rem;
+          padding: 0.675em 1em 0.675em 1em;
+          background-color: #fff;
+          border: 1px solid #caced1;
+          border-radius: 0.25rem;
+          color: #000;
+          cursor: pointer;
+        }
+
+        .selectUser {
+          float: left;
+          margin-block-start: 0.5em;
+          margin-block-end: 1.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        .userInfo{
+          font-size: 0.6rem;
+          margin-block-start: 2em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        #statusButton{
+          width: auto;
+          font-size: 0.55rem;
+          margin: 10px 10px 20px 0px;
+          padding: 0;
+        }
+
+        .warningGroup{
+          max-width: 500px;
+          display: inline-block;
+        }
+
+        .warningSensor{
+          display: inline-block;
+          width: 200px;
+          font-size: 0.8rem;
+        }
+
+        .sensorNote {
+          font-size: 0.8rem;
+        }
+
+        .childNoteContent {
+          font-size: 0.8rem;
+        }
+
+        #graphTitle {
+          font-size: 0.8rem;  
+        }
+
+        .chart-container-row-item {
+          width: 250px;
+          display: inline-block;
+        }
+
+        .chart-container-row {
+          width: 520px;
+          display: inline-block;
+        }
+
+        .chartName {
+          font-size: 0.9rem;
+        }
+
+        .highcharts-axis-title {
+          font-size: 0.9rem !important; 
+        }
+
+        .highcharts-axis-labels {
+          font-size: 0.9rem !important; 
+        }
+        
+        .highcharts-yaxis-labels {
+          font-size: 0.9rem !important; 
+        }
+
+        .highcharts-legend-item {
+          font-size: 0.9rem !important; 
+        }
+
+        .highcharts-xaxis-labels{
+          font-size: 0.45rem !important;
+        }
+      }
+
+      @media only screen and (max-width: 450px) {
+        .topnav {
+          font-size: 0.8rem;
+        }
+
+        .img-fluid{
+          margin-block-start: 0.5em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 2px;
+          margin-inline-end: 2px;
+          max-width: 40px;
+          max-height: 40px;
+        }
+
+        select {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 100%;
+          font-size: 0.45rem;
+          padding: 0.675em 1em 0.675em 1em;
+          background-color: #fff;
+          border: 1px solid #caced1;
+          border-radius: 0.25rem;
+          color: #000;
+          cursor: pointer;
+        }
+
+        .selectUser {
+          float: left;
+          margin-block-start: 0.5em;
+          margin-block-end: 1.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        .userInfo{
+          font-size: 0.5rem;
+          margin-block-start: 2em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        #statusButton{
+          width: auto;
+          font-size: 0.45rem;
+          margin: 10px 10px 20px 0px;
+          padding: 0;
+        }
+
+        .warningGroup{
+          max-width: 360px;
+          display: inline-block;
+        }
+
+        .warningSensor{
+          display: inline-block;
+          width: 120px;
+          font-size: 0.6rem;
+        }
+
+        .sensorNote {
+          font-size: 0.6rem;
+        }
+
+        .childNoteContent {
+          font-size: 0.6rem;
+        }
+
+        #graphTitle {
+          font-size: 0.6rem;  
+        }
+
+        .chart-container-row-item {
+          width: 200px;
+          display: inline-block;
+        }
+
+        .chart-container-row {
+          width: 420px;
+          display: inline-block;
+        }
+
+        .chartName {
+          font-size: 0.8rem;
+        }
+
+        .highcharts-axis-title {
+          font-size: 0.8rem !important; 
+        }
+
+        .highcharts-axis-labels {
+          font-size: 0.8rem !important; 
+        }
+        
+        .highcharts-yaxis-labels {
+          font-size: 0.8rem !important; 
+        }
+
+        .highcharts-legend-item {
+          font-size: 0.8rem !important; 
+        }
+
+        .highcharts-xaxis-labels{
+          font-size: 0.4rem !important;
+        }
+      }
+
+      @media only screen and (max-width: 400px) {
+        .topnav {
+          font-size: 0.7rem;
+        }
+
+        .img-fluid{
+          margin-block-start: 0.5em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 2px;
+          margin-inline-end: 2px;
+          max-width: 40px;
+          max-height: 40px;
+        }
+
+        select {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 100%;
+          font-size: 0.4rem;
+          padding: 0.675em 1em 0.675em 1em;
+          background-color: #fff;
+          border: 1px solid #caced1;
+          border-radius: 0.25rem;
+          color: #000;
+          cursor: pointer;
+        }
+
+        .selectUser {
+          float: left;
+          margin-block-start: 0.5em;
+          margin-block-end: 1.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        .userInfo{
+          font-size: 0.5rem;
+          margin-block-start: 2em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        #statusButton{
+          width: auto;
+          font-size: 0.45rem;
+          margin: 10px 10px 20px 0px;
+          padding: 0;
+        }
+
+        .warningGroup{
+          max-width: 360px;
+          display: inline-block;
+        }
+
+        .warningSensor{
+          display: inline-block;
+          width: 120px;
+          font-size: 0.6rem;
+        }
+
+        .sensorNote {
+          font-size: 0.6rem;
+        }
+
+        .childNoteContent {
+          font-size: 0.6rem;
+        }
+
+        #graphTitle {
+          font-size: 0.6rem;  
+        }
+
+        .chart-container-row-item {
+          width: 160px;
+          display: inline-block;
+        }
+
+        .chart-container-row {
+          width: 340px;
+          display: inline-block;
+        }
+
+        .chartName {
+          font-size: 0.6rem;
+        }
+
+        .highcharts-axis-title {
+          font-size: 0.6rem !important; 
+        }
+
+        .highcharts-axis-labels {
+          font-size: 0.6rem !important; 
+        }
+        
+        .highcharts-yaxis-labels {
+          font-size: 0.6rem !important; 
+        }
+
+        .highcharts-legend-item {
+          font-size: 0.6rem !important; 
+        }
+
+        .highcharts-xaxis-labels{
+          font-size: 0.3rem !important;
+        }
+      }
+
+      @media only screen and (max-width: 300px) {
+        .topnav {
+          font-size: 0.45rem;
+        }
+
+        .img-fluid{
+          margin-block-start: 0.5em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 2px;
+          margin-inline-end: 2px;
+          max-width: 40px;
+          max-height: 40px;
+        }
+
+        select {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 100%;
+          font-size: 0.3rem;
+          padding: 0.675em 1em 0.675em 1em;
+          background-color: #fff;
+          border: 1px solid #caced1;
+          border-radius: 0.25rem;
+          color: #000;
+          cursor: pointer;
+        }
+
+        .selectUser {
+          float: left;
+          margin-block-start: 0.5em;
+          margin-block-end: 1.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        .userInfo{
+          font-size: 0.3rem;
+          margin-block-start: 3.5em;
+          margin-block-end: 0.5em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+        }
+
+        #statusButton{
+          width: auto;
+          font-size: 0.3rem;
+          margin: 10px 10px 20px 0px;
+          padding: 0;
+        }
+
+        .warningGroup{
+          max-width: 240px;
+          display: inline-block;
+        }
+
+        .warningSensor{
+          display: inline-block;
+          width: 80px;
+          font-size: 0.4rem;
+        }
+
+        .sensorNote {
+          font-size: 0.4rem;
+        }
+
+        .childNoteContent {
+          font-size: 0.4rem;
+        }
+
+        #graphTitle {
+          font-size: 0.4rem;  
+        }
+
+        .chart-container-row-item {
+          width: 120px;
+          display: inline-block;
+        }
+
+        .chart-container-row {
+          width: 250px;
+          display: inline-block;
+        }
+
+        .chartName {
+          font-size: 0.4rem;
+        }
+
+        .highcharts-axis-title {
+          font-size: 0.4rem !important; 
+        }
+
+        .highcharts-axis-labels {
+          font-size: 0.4rem !important; 
+        }
+        
+        .highcharts-yaxis-labels {
+          font-size: 0.4rem !important; 
+        }
+
+        .highcharts-legend-item {
+          font-size: 0.4rem !important; 
+        }
+
+        .highcharts-xaxis-labels{
+          font-size: 0.2rem !important;
+        }
+
+        #map {
+          height: 50%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topnav">
+      <h1>HỆ THỐNG GIÁM SÁT TRẠNG THÁI LÍNH CỨU HỎA<i class="fas fa-clipboard-list"></i></h1>
+    </div>
+    <div class="belowTopnav">
+      <a class="navbar-brand" href="/">
+        <div class="logo-image">
+          <img src="/public/image/TDT_logo.png" class="img-fluid">
+        </div>
+      </a>
+      <div class="selectUser">
+        <select id="selectUser" class="custom-select" title="selectUser">
+        </select>
+      </div>
+      <div id="userName" class="userInfo">
+      </div>
+      <div id="userLevel" class="userInfo">
+      </div>
+      <div id="userSpecialist" class="userInfo">
+      </div>
+      <button id="statusButton">Idle</button>
+    </div>
+
+    <script defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBRK-de72dHozdhlZ_OwCVqEL67BuQJEH8
+        &libraries=visualization&callback=initMap">
+    </script>
+
+    <script>
+        const markerPath = "M 0 0 L 27 0 C 28 1 28 2 27 3 L 0 3 L 0 0 M \
+                            32 0 C 31 1 31 2 32 3 L 37 3 L 37 0 L 32 0 M 0 \
+                            0 L -9 8 L -6 8 L 0 3 M 37 0 L 46 8 L 43 8 L \
+                            37 3 M 46 8 C 25 18 15 18 -9 8 M -6 8 C 15 16 25 16 \
+                            43 8 M -1 11 C -2 16 -2 20 2 23 C 2 25 2 25 0 25 C \
+                            -4 21 -5 16 -4 10 M 39 11 C 40 16 39 20 36 23 C 36 25 36 \
+                            25 38 25 C 42 19 43 15 42 10 M 20 0 L 26 -9 L 17 -15 L \
+                            8 -9 L 10 -7 C 11 -7 11 -7 12 -8 L 11 -9 L 17 -13 L 24 \
+                            -9 L 18 0 M 11 -6 L 15 0 L 17 0 L 12 -7 L 11 -6 M \
+                            17 -11 C 22 -7 20 -4 18 -4 C 16 -4 15 -6 15 -6 L 16 -6 C \
+                            16 -5 17 -5 18 -5 C 20 -6 19 -8 17 -11 M 17 -11 C 17 -7 17 \
+                            -7 16 -6 M 15 -6 C 16 -10 16 -10 17 -11 M 0 0 C 0 -35 37 \
+                            -35 37 0 Z";
+
+        const markerPath2 = "M 30 -40 C 26 -40 24 -40 21 -38 L 16 -24 L 16 13 L 30 13 L 30 \
+                            -11 C 26 -13 23 -16 23 -20 C 24 -23 27 -23 30 -23 Z M 30 -40 C \
+                            34 -40 37 -40 39 -38 L 44 -24 L 44 13 L 30 13 L 30 -11 C 35 -13 \
+                            37 -16 37 -20 C 36 -23 33 -23 30 -23 L 30 -40 Z M 16 -24 L 15 \
+                            -33 Q -4 -23 -9 -2 L -9 20 C -5 20 -2 22 -2 22 L -2 17 C 4 14 10 \
+                            13 16 13 Z M 44 -24 L 46 -33 Q 63 -22 69 -2 L 69 20 C 65 20 63 \
+                            21 61 22 L 61 17 C 56 14 51 13 44 13 Z M -9 -2 Q -70 24 -10 53 \
+                            Q 6 79 28 84 L 28 78 Q -1 73 -5 28 C -8 29 -14 23 -9 20 Z M 69 \
+                            -2 Q 130 16 71 53 Q 56 70 28 84 L 28 78 Q 60 67 67 28 C 75 27 73 \
+                            22 69 20 Z";
+        const scaleFactor = 0.25;
+        
+        const Radius = 6371; 
+        const Radians = Math.PI / 180;
+        var cenLat, otherLat, cenLon, otherLon, dLat, dLon, distanceInKm, distanceInMeter;
+
+        function initMap(latVal=21, lngVal=105.8, marker=false, markerInfo=[], centerMarker=0, userList=[]) {
+          var myLatLng;
+          console.log(markerInfo);
+          if (marker){
+            myLatLng = { lat: markerInfo[centerMarker][0], lng: markerInfo[centerMarker][1] };
+          }
+          else{
+            myLatLng = { lat: latVal, lng: lngVal };
+          }
+          var map = new google.maps.Map(document.getElementById('map'), {
+          center: myLatLng,
+          zoom: 16,
+          styles: [{
+              featureType: 'poi',
+              stylers: [{ visibility: 'off' }]  // Turn off points of interest.
+          }, {
+              featureType: 'transit.station',
+              stylers: [{ visibility: 'off' }]  // Turn off bus stations, train stations, etc.
+          }],
+          disableDoubleClickZoom: true,
+          streetViewControl: false
+          });
+          
+          if (marker){
+            var infoWindow = new google.maps.InfoWindow();
+            var otherUserMarker = [], infoWindowContent = [];
+
+            cenLat = markerInfo[centerMarker][0];
+            cenLon = markerInfo[centerMarker][1];
+        
+            console.log(centerMarker + ": " + cenLat + " " + cenLon);
+
+            const svgMarkerCenter = {
+              path: markerPath2,
+              fillColor: "red",
+              fillOpacity: 1,
+              strokeWeight: 0,
+              rotation: 0,
+              scale: scaleFactor,
+            };
+
+            var centerUserMarker = new google.maps.Marker({
+              position: myLatLng,
+              map,
+              icon: svgMarkerCenter,
+              title: userList[centerMarker]
+            });
+
+            centerUserMarker.addListener('click', () => {
+              infoWindow.setContent(userList[centerMarker]);
+              infoWindow.open(map, centerUserMarker);
+            });
+
+            const svgMarker = {
+              path: markerPath2,
+              fillColor: "brown",
+              fillOpacity: 1,
+              strokeWeight: 0,
+              rotation: 0,
+              scale: scaleFactor,
+            };
+
+            for (let i = 0; i < markerInfo.length; i++) {
+              if (i == centerMarker) continue;
+
+              otherLat = markerInfo[i][0];
+              otherLon = markerInfo[i][1];
+
+              console.log(i + ": " + otherLat + " " + otherLon);
+              var markLatLng = { lat: otherLat, lng: otherLon }
+              otherUserMarker[i] = new google.maps.Marker({
+                position: markLatLng,
+                map,
+                icon: svgMarker,
+                title: userList[i]
+              });
+
+              dLat = Radians * (otherLat - cenLat);
+              dLon = Radians * (otherLon - cenLon);
+              var a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                      + Math.cos(Radians * cenLat)
+                      * Math.cos(Radians * otherLat) * Math.sin(dLon / 2)
+                      * Math.sin(dLon / 2);
+              var c = 2 * Math.asin(Math.sqrt(a));
+              distanceInKm = Radius * c;
+              distanceInMeter = distanceInKm * 1000;
+
+              infoWindowContent[i] = "<div>" + userList[i] + "</div>"
+                                      + "Khoảng cách đến chiến sỹ " + userList[centerMarker] + " là: " + distanceInMeter.toFixed(2) + " m";
+
+              otherUserMarker[i].addListener('click', () => {
+                infoWindow.setContent(infoWindowContent[i]);
+                infoWindow.open(map, otherUserMarker[i]);
+              });
+            }
+          }
+
+          closePopup(); 
+        }
+
+        function closePopup() {
+          setTimeout(
+            function() {
+              try {
+                    var alertText = document.getElementsByTagName("span");
+                    for (let i = 0; i < alertText.length; i++) {
+                      if (alertText[i].innerText == "This page can't load Google Maps correctly.") {
+                        var wrap = alertText[i].parentElement.parentElement;
+                        var button = wrap.getElementsByTagName("button")[0];
+                        button.click();
+                      }
+                    }
+                } catch (error) {
+                  console.log("Map is not loaded");
+                }
+            }, 1500);
+        }
+    </script>
+
+    <div class="content-sign-in" id="content-sign-in">
+      <div class="warningGroup">
+        <div class="warningSensor" id="gasWarning">
+          GAS WARNING
+        </div>
+        <div class="warningSensor" id="pressureWarning">
+          PRESSURE WARNING
+        </div>
+        <div class="warningSensor" id="spo2Warning">
+          SPO2 WARNING
+        </div>
+        <div class="warningSensor" id="heartrateWarning">
+          HEARTRATE WARNING
+        </div>
+        <div class="warningSensor" id="coWarning">
+          CO WARNING
+        </div>
+        <div class="warningSensor" id="speedWarning">
+          SPEED WARNING
+        </div>
+      </div>
+      <button type="button" class="sensorNote">Chú thích cho cảnh báo của các cảm biến trên</button>
+      <div class="sensorNoteContent">
+        <p class="childNoteContent">
+          <green-marked>GAS Warning</green-marked>: Không có rò rỉ khí GAS.<br>
+          <mark>GAS Warning</mark>: Cảnh báo môi trường có khí GAS.<br>
+          <red-marked>GAS Warning</red-marked>: Cảnh báo rò rỉ khí GAS với số lượng lớn, đề phòng cháy nổ.
+        </p>
+        <p class="childNoteContent">
+          <green-marked>Pressure Warning</green-marked>: Áp suất ổn định, không có nguy hiểm.<br>
+          <mark>Pressure Warning</mark>: Áp suất đang thấp hơn môi trường, cảnh báo nguy hiểm.
+        </p>
+        <p class="childNoteContent">
+          <green-marked>SPO2 Warning</green-marked>: Oxy trong máu tốt ổn định.<br>
+          <mark>SPO2 Warning</mark>: đang trong tình trạng thiếu Oxy trong máu.<br>
+          <red-marked>SPO2 Warning</red-marked>: Cảnh báo nguy hiểm khẩn cấp do thiếu Oxy nghiêm trọng.
+        </p>
+        <p class="childNoteContent">
+          <green-marked>Heartrate Warning</green-marked>: Nhịp tim tốt ổn định.<br>
+          <mark>Heartrate Warning</mark>: Cảnh báo nhịp tim không ổn định, sự sống đang bị đe dọa.
+        </p>
+        <p class="childNoteContent">
+          <green-marked>CO Warning</green-marked>: CO trong không khí thấp, không ảnh hưởng sức khỏe.<br>
+          <mark>CO Warning</mark>: Cảnh báo mức CO ở mức trung bình.<br>
+          <red-marked>CO Warning</red-marked>: Cảnh báo mức CO trong không khí rất lớn, đề phòng bị ngộ độc.
+        </p>
+        <p class="childNoteContent">
+          <green-marked>Speed Warning</green-marked>: Người sử dụng đang chuyển động.<br>
+          <mark>Speed Warning</mark>: Cảnh báo bất động, cần kiểm tra tình trạng hiện tại.
+        </p>
+      </div>
+      <div id="charts-div" >
+        <div>
+          <p id="graphTitle"> GRAPHS</p>
+        </div>
+        <div class="cards">
+          <div class="card">
+            <div class="chart-container-row">
+              <div class="chart-container-row-item">
+                <div class="chartName">TEMPERATURE <b id="tempVal"></b> (°C)</div>
+                <div id="chart-temperature"></div>
+              </div>
+              <div class="chart-container-row-item">
+                <div class="chartName">GAS <b id="gasVal"></b> (ppm)</div>
+                <div id="chart-gas"></div>
+              </div>
+              <div class="chart-container-row-item">
+                <div class="chartName">HEARTRATE <b id="heartRateVal"></b> (bpm)</div>
+                <div id="chart-heartrate"></div>
+              </div>
+              <div class="chart-container-row-item">
+                <div class="chartName">PRESSURE <b id="pressureVal"></b> (hPa)</div>
+                <div id="chart-pressure"></div>
+              </div>
+            </div>
+            <div class="chart-container-row">
+              <div class="chart-container-row-item">
+                <div class="chartName">SPEED <b id="speedVal"></b> (m/s)</div>
+                <div id="chart-speed"></div>
+              </div>
+              <div class="chart-container-row-item">
+                <div class="chartName">SPO2 <b id="spo2Val"></b> (%)</div>
+                <div id="chart-spo2"></div>
+              </div>
+              <div class="chart-container-row-item">
+                <div class="chartName">VELOCITY <b id="velVal"></b> (m/s^2)</div>
+                <div id="chart-velo"></div>
+              </div>
+              <div class="chart-container-row-item">
+                <div class="chartName">CO <b id="coVal"></b> (ppm)</div>
+                <div id="chart-co"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" id="update-btn">Change</button>
+      <button type="button" id="clear-btn">Clear</button>
+    </div>
+    <div id="map"></div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js";
+
+      var chartTemp, chartHeartrate, chartGas, chartPressure, chartSpeed, chartSpO2, chartVelo, chartCO;
+      var updateBtn, selectUserBtn, clearBtn;
+      var selectUserChoice;
+      var currentGetUser = "";
+      var userList = [];
+
+      const pressureLimit = 1013.25;
+      const spo2Limit = 97, spo2DangerLimit = 91;
+      const heartrateLowerLimit = 40, heartrateUpperLimit = 180;
+      const gasLimit = 4400, gasDangerLimit = 5000;
+      const coLimit = 900, coDangerLimit = 1400;
+      const speedLimit = 2;
+
+      var pressureWarningLevel = 0;
+      var spo2WarningLevel = 0;
+      var heartrateWarningLevel = 0;
+      var gasWarningLevel = 0;
+      var coWarningLevel = 0;
+      var speedWarningLevel = 0;
+      var initTimer = 1;
+      var startIdleSpeedTime = 0;
+
+      const minute = 1000 * 60;
+      const hour = minute * 60;
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBB5k8IfAwdcJLd6d_ndx7CAhE_7hzYi7s",
+        authDomain: "dath41602178-9e556.firebaseapp.com",
+        databaseURL: "https://dath41602178-9e556-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dath41602178-9e556",
+        storageBucket: "dath41602178-9e556.appspot.com",
+        messagingSenderId: "732781692344",
+        appId: "1:732781692344:web:548fde55df6139ae70bb4d",
+        measurementId: "G-GDMCPWHDWE"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      import { getDatabase, ref, child, onValue, get, set, off }
+      from "https://www.gstatic.com/firebasejs/9.1.1/firebase-database.js";
+
+      const db = getDatabase();
+
+      function GetUserList(){
+        var dbRef = ref(db, "IoTLab/users");
+
+        var userOption = document.getElementById('selectUser');
+
+        get(dbRef)
+        .then((snapshot)=>{
+          var users = [], i = 0;
+          for (const [key, value] of Object.entries(snapshot.toJSON())) {
+            users.push(key);
+          }
+
+          snapshot.forEach(childSnapshot => {
+            var user = document.createElement('option');
+            var userName = childSnapshot.toJSON().name;
+
+            user.setAttribute('value', users[i]);
+            user.innerHTML = userName;
+
+            userOption.appendChild(user);
+
+            userList.push(userName);
+
+            i += 1;
+          })
+        })
+      }
+
+      function GetUserInfo(currentUser="user1"){
+        var dbRef = ref(db, "IoTLab/users");
+
+        var userName = document.getElementById('userName');
+        var userLevel = document.getElementById('userLevel');
+        var userSpecialist = document.getElementById('userSpecialist');
+
+        get(dbRef)
+        .then((snapshot)=>{
+          var userInfo = snapshot.toJSON()[currentUser];
+          userName.innerHTML = "<b>" + "Tên: " + userInfo.name + "</b>";
+          userLevel.innerHTML = "<b>" + "Cấp bậc: " + userInfo.level + "</b>";
+          userSpecialist.innerHTML = "<b>" + "Nhiệm vụ: " + userInfo.specialist + "</b>";
+        })
+      }
+      
+      function GetDataRealTime(user="user1", changed=false){
+        if (changed){
+          var dbRef = ref(db, "IoTLab/" + currentGetUser);
+          off(dbRef);
+          initTimer = 1;
+          startIdleSpeedTime = 0;
+        }
+        var dbRef = ref(db, "IoTLab/" + user);
+        currentGetUser = user;
+
+        var statusBtn = document.getElementById("statusButton");
+
+        onValue(dbRef, (snapshot)=>{
+          var sensor = [];
+          var latVal, lngVal;
+
+          snapshot.forEach(childSnapshot => {
+            sensor.push(childSnapshot.val());
+
+            var currentTime = Date.now() + 7 * hour;
+
+            switch (childSnapshot.key){
+                case "temperature":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+
+                    document.getElementById("tempVal").innerHTML = childSnapshot.val();
+                    if(chartTemp.series[0].data.length > 40) {
+                        chartTemp.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartTemp.series[0].addPoint([x, y], true, false, true);
+                    }
+                    break;
+                case "GAS":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+
+                    document.getElementById("gasVal").innerHTML = childSnapshot.val();
+                    if(chartGas.series[0].data.length > 40) {
+                        chartGas.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartGas.series[0].addPoint([x, y], true, false, true);
+                    }
+
+                    updateWarningSensor("GAS", childSnapshot.val());
+                    break;
+                case "CO":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+                    
+                    document.getElementById("coVal").innerHTML = childSnapshot.val();
+                    if(chartCO.series[0].data.length > 40) {
+                    chartCO.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                    chartCO.series[0].addPoint([x, y], true, false, true);
+                    }
+
+                    updateWarningSensor("CO", childSnapshot.val());
+                    break;
+                case "heartRate":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+                    
+                    document.getElementById("heartRateVal").innerHTML = childSnapshot.val();
+                    if(chartHeartrate.series[0].data.length > 40) {
+                        chartHeartrate.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartHeartrate.series[0].addPoint([x, y], true, false, true);
+                    }
+
+                    updateWarningSensor("heartRate", childSnapshot.val());
+                    break;
+                case "speed":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+                    
+                    document.getElementById("speedVal").innerHTML = childSnapshot.val();
+                    if(chartSpeed.series[0].data.length > 40) {
+                        chartSpeed.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartSpeed.series[0].addPoint([x, y], true, false, true);
+                    }
+
+                    updateWarningSensor("speed", childSnapshot.val());
+                    break;
+                case "spo2":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+                    
+                    document.getElementById("spo2Val").innerHTML = childSnapshot.val();
+                    if(chartSpO2.series[0].data.length > 40) {
+                        chartSpO2.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartSpO2.series[0].addPoint([x, y], true, false, true);
+                    }
+
+                    updateWarningSensor("spo2", childSnapshot.val());
+                    break;
+                case "velocity":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+                    
+                    document.getElementById("velVal").innerHTML = childSnapshot.val();
+                    if(chartVelo.series[0].data.length > 40) {
+                        chartVelo.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartVelo.series[0].addPoint([x, y], true, false, true);
+                    }
+                    break;
+                case "pressure":
+                    var x = currentTime, y = parseFloat(childSnapshot.val());
+                    
+                    document.getElementById("pressureVal").innerHTML = childSnapshot.val();
+                    if(chartPressure.series[0].data.length > 40) {
+                        chartPressure.series[0].addPoint([x, y], true, true, true);
+                    } else {
+                        chartPressure.series[0].addPoint([x, y], true, false, true);
+                    }
+
+                    updateWarningSensor("pressure", childSnapshot.val());
+                    break;
+            }
+          })
+
+          var statusSum = coWarningLevel + gasWarningLevel + pressureWarningLevel 
+                      + speedWarningLevel + spo2WarningLevel + heartrateWarningLevel;
+          if (statusSum == 0){
+            statusBtn.style.backgroundColor = "#65B741";
+            statusBtn.innerText = "Good";
+          }
+          else {
+            statusBtn.style.backgroundColor = "#FAEF5D";
+            statusBtn.innerText = "Caution";
+          }
+
+          if (coWarningLevel == 2 || gasWarningLevel == 2 || spo2WarningLevel == 2){
+            statusBtn.style.backgroundColor = "#D24545";
+            statusBtn.innerText = "Danger";
+          }
+
+          console.log(sensor);
+        })
+      }
+
+      function updateWarningSensor(sensor, sensorValue){
+        switch (sensor){
+          case "pressure":
+            var pressureWarning = document.getElementById("pressureWarning");
+            if (sensorValue < pressureLimit){
+              pressureWarning.style.backgroundColor = "#FAEF5D";
+              pressureWarningLevel = 1;
+            }
+            else {
+              pressureWarning.style.backgroundColor = "#65B741";
+              pressureWarningLevel = 0;
+            }
+            break;
+          case "spo2":
+            var spo2Warning = document.getElementById("spo2Warning");
+            if (sensorValue < spo2DangerLimit){
+              spo2Warning.style.backgroundColor = "#D24545";
+              spo2WarningLevel = 2;
+            }
+            else if (sensorValue < spo2Limit) {
+              spo2Warning.style.backgroundColor = "#FAEF5D";
+              spo2WarningLevel = 1;
+            }
+            else {
+              spo2Warning.style.backgroundColor = "#65B741";
+              spo2WarningLevel = 0;
+            }
+            break;
+          case "heartRate":
+            var heartrateWarning = document.getElementById("heartrateWarning");
+            if (sensorValue < heartrateLowerLimit || sensorValue > heartrateUpperLimit){
+              heartrateWarning.style.backgroundColor = "#FAEF5D";
+              heartrateWarningLevel = 1;
+            }
+            else {
+              heartrateWarning.style.backgroundColor = "#65B741";
+              heartrateWarningLevel = 0;
+            }
+            break;
+          case "GAS":
+            var gasWarning = document.getElementById("gasWarning");
+            if (sensorValue > gasDangerLimit){
+              gasWarning.style.backgroundColor = "#D24545";
+              gasWarningLevel = 2;
+            }
+            else if (sensorValue > gasLimit) {
+              gasWarning.style.backgroundColor = "#FAEF5D";
+              gasWarningLevel = 1;
+            }
+            else {
+              gasWarning.style.backgroundColor = "#65B741";
+              gasWarningLevel = 0;
+            }
+            break;
+          case "CO":
+            var coWarning = document.getElementById("coWarning");
+            if (sensorValue > coDangerLimit){
+              coWarning.style.backgroundColor = "#D24545";
+              coWarningLevel = 2;
+            }
+            else if (sensorValue > coLimit) {
+              coWarning.style.backgroundColor = "#FAEF5D";
+              coWarningLevel = 1;
+            }
+            else {
+              coWarning.style.backgroundColor = "#65B741";
+              coWarningLevel = 0;
+            }
+            break;
+          case "speed":
+            var speedWarning = document.getElementById("speedWarning");
+
+            if (sensorValue < speedLimit){
+              var currentTime = new Date().getTime();
+
+              if (initTimer == 1){
+                startIdleSpeedTime = currentTime;
+                initTimer = 0;
+              }
+              else {
+                var timePass = (currentTime - startIdleSpeedTime) / 1000;
+                
+                if (timePass > 300) {
+                  speedWarning.style.backgroundColor = "#FAEF5D";
+                  speedWarningLevel = 1;
+                }
+                else {
+                  speedWarning.style.backgroundColor = "#65B741";
+                  speedWarningLevel = 0;
+                }
+              }
+            }
+            else {
+              initTimer = 1;
+              startIdleSpeedTime = 0;
+            }
+            break;
+        }
+      }
+
+      function GetMapData(centerUser="user1", changed=false){
+        if (changed){
+          var dbRef = ref(db, "IoTLab/" + currentGetUser);
+          off(dbRef);
+        }
+        var dbRef = ref(db, "IoTLab/" + centerUser);
+
+        onValue(dbRef, (snapshot)=>{
+          getMapInfo(centerUser);
+        })
+      }
+
+      function getMapInfo(centerUser){
+        var dbRef = ref(db, "IoTLab");
+
+        get(dbRef)
+        .then((snapshot)=>{
+          var latlngInfo = [], i = 0;
+          for (const [key, value] of Object.entries(snapshot.toJSON())) {
+            if (centerUser != key){
+              i = i + 1;
+            }
+            else{
+              break;
+            }
+          }
+          console.log(snapshot.toJSON());
+          snapshot.forEach(childSnapshot => {
+            var userObj = childSnapshot.toJSON();
+
+            if(userObj.lat !== undefined){
+              var userLatLngInfo = [userObj.lat, userObj.lng];
+              latlngInfo.push(userLatLngInfo);
+            }
+          })
+
+          initMap(0, 0, true, latlngInfo, i, userList);
+        })
+      }
+
+      function createChart(chartId, chartName, chartYTitle, SeriesColor) {
+        var chart = new Highcharts.Chart({
+          chart:{ 
+            renderTo: chartId,
+            type: 'spline',
+            height: (9 / 10 * 100) + '%'
+          },
+          series: [
+            {
+              name: chartName,
+              color: SeriesColor
+            }
+          ],
+          title: { 
+            text: undefined
+          },
+          plotOptions: {
+            line: { 
+              animation: false,
+              dataLabels: { 
+                enabled: true 
+              }
+            }
+          },
+          xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: { second: '%H:%M:%S' }
+          },
+          yAxis: {
+            title: { 
+              text: chartYTitle
+            }
+          },
+          credits: { 
+            enabled: false 
+          }
+        });
+        return chart;
+      }
+      
+      updateBtn = document.getElementById("update-btn");
+      updateBtn.addEventListener("click", updateFirebase);
+
+      function updateFirebase(){
+        var lat = 21;
+        var lng = 105.8
+
+        var offsetLat = Math.random() / 450;
+        var offsetLng = Math.random() / 450;
+
+        set(ref(db, 'IoTLab/user1'), {
+          temperature: Math.floor(Math.random() * 3) + 37,
+          GAS: Math.floor(Math.random() * 2500) + 3500,
+          CO: Math.floor(Math.random() * 1000) + 600,
+          heartRate: Math.floor(Math.random() * 180) + 20,
+          speed: Math.floor(Math.random() * 150) / 100,
+          spo2: Math.floor(Math.random() * 10) + 90,
+          velocity: Math.floor(Math.random() * 20),
+          pressure: Math.floor(Math.random() * 700) + 800,
+          lat: lat + offsetLat,
+          lng: lng + offsetLng
+        });
+
+        set(ref(db, 'IoTLab/user2'), {
+          temperature: Math.floor(Math.random() * 3) + 37,
+          GAS: Math.floor(Math.random() * 2500) + 3500,
+          CO: Math.floor(Math.random() * 1000) + 600,
+          heartRate: Math.floor(Math.random() * 180) + 20,
+          speed: Math.floor(Math.random() * 150) / 100,
+          spo2: Math.floor(Math.random() * 10) + 90,
+          velocity: Math.floor(Math.random() * 20),
+          pressure: Math.floor(Math.random() * 700) + 800,
+          lat: lat + offsetLat * 1.1,
+          lng: lng + offsetLng * 1.2
+        });
+
+        set(ref(db, 'IoTLab/user3'), {
+          temperature: Math.floor(Math.random() * 3) + 37,
+          GAS: Math.floor(Math.random() * 2500) + 3500,
+          CO: Math.floor(Math.random() * 1000) + 600,
+          heartRate: Math.floor(Math.random() * 180) + 20,
+          speed: Math.floor(Math.random() * 150) / 100,
+          spo2: Math.floor(Math.random() * 10) + 90,
+          velocity: Math.floor(Math.random() * 20),
+          pressure: Math.floor(Math.random() * 700) + 800,
+          lat: lat + offsetLat * 1.3,
+          lng: lng + offsetLng * 0.7
+        });
+
+        set(ref(db, 'IoTLab/user4'), {
+          temperature: Math.floor(Math.random() * 3) + 37,
+          GAS: Math.floor(Math.random() * 2500) + 3500,
+          CO: Math.floor(Math.random() * 1000) + 600,
+          heartRate: Math.floor(Math.random() * 180) + 20,
+          speed: Math.floor(Math.random() * 150) / 100,
+          spo2: Math.floor(Math.random() * 10) + 90,
+          velocity: Math.floor(Math.random() * 20),
+          pressure: Math.floor(Math.random() * 700) + 800,
+          lat: lat + offsetLat * 1.2,
+          lng: lng + offsetLng * 0.8
+        });
+      }
+
+      clearBtn = document.getElementById("clear-btn");
+      clearBtn.addEventListener("click", initChart);
+
+      function initChart(){
+        chartTemp = createChart('chart-temperature', 'Temperature', 'Celsius Degrees', 'brown');
+        chartGas = createChart('chart-gas', 'Gas level', 'ppm', 'black');
+        chartHeartrate = createChart('chart-heartrate', 'Heart Rate', 'BPM', 'red');
+        chartPressure = createChart('chart-pressure', 'Pressure', 'hPa', 'blue');
+        chartSpO2 = createChart('chart-spo2', 'SpO2', '%', 'purple');
+        chartSpeed = createChart('chart-speed', 'Speed', 'm/s', 'green');
+        chartVelo = createChart('chart-velo', 'Velocity', 'm/s^2', '#D63484');
+        chartCO = createChart('chart-co', 'CO', 'ppm', 'orange');
+      }
+
+      selectUserChoice = document.getElementById("selectUser");
+      selectUserChoice.addEventListener("change", selectThisUser);
+      
+      var coll = document.getElementsByClassName("sensorNote");
+      var i;
+
+      for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          if (content.style.display === "block") {
+            content.style.display = "none";
+          } else {
+            content.style.display = "block";
+          }
+        });
+      }
+
+      function selectThisUser(){
+        initChart();
+        GetUserInfo(selectUserChoice.value);
+        GetDataRealTime(selectUserChoice.value, true);
+        GetMapData(selectUserChoice.value, true);
+      }
+
+      window.onload = function(){
+        initChart();
+        GetUserList();
+        GetUserInfo();
+        GetDataRealTime();
+        GetMapData();
+      }
+    </script>
+  </body>
+</html>
