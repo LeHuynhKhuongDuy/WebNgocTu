@@ -1210,10 +1210,6 @@
       }
 
       function GetMapData(centerUser="user1", changed=false){
-        if (changed){
-          var dbRef = ref(db, "IoTLab/" + currentGetUser);
-          off(dbRef);
-        }
         var dbRef = ref(db, "IoTLab/" + centerUser);
 
         onValue(dbRef, (snapshot)=>{
@@ -1235,7 +1231,6 @@
               break;
             }
           }
-          console.log(snapshot.toJSON());
           snapshot.forEach(childSnapshot => {
             var userObj = childSnapshot.toJSON();
 
@@ -1386,6 +1381,7 @@
 
       function selectThisUser(){
         initChart();
+        console.log("he")
         GetUserInfo(selectUserChoice.value);
         GetDataRealTime(selectUserChoice.value, true);
         GetMapData(selectUserChoice.value, true);
